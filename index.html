@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -77,6 +76,13 @@
 		<span id="y_max" style="position:absolute; left:460px; top:110px;"></span>
 		<img class="graph-img" src="graph.jpg" />
 		<div style="left:900px;position: absolute;">
+			<div class="form-group row">
+			  <label for="example-text-input" class="col-5 col-form-label">No of Characters:</label>
+			  <div class="col-5">
+			    <input id="numCharacters" class="form-control" type="number" max="8" min="1" maxlength="1" value="5" id="example-text-input">
+			  </div>
+			</div>
+
 			<button class="btn" id="submitButton">submit</button>
 			<button class="btn" onclick="location.reload();">refresh</button>
 		</div>
@@ -195,12 +201,8 @@
 			});
 		}
 
-
-		$(document).ready(function(){
-			var surveys;
-			var items;
-			var no_of_items = 3;
-
+		function getCharacters(no_of_items) {
+			$(".character-row").html("")
 			$.get("http://54.219.178.230/api/Surveys", function(data, status){
 				surveys = data;
 				var survey_id = surveys[0]['id'];
@@ -222,6 +224,19 @@
 				});
 				// console.log(surveys[0]);
 			});
+		}
+
+		$(document).ready(function(){
+			var surveys;
+			var items;
+			var no_of_items = 5;
+
+			$("#numCharacters").change(function() {
+				no_of_items = $(this).val();
+				getCharacters(no_of_items);
+			})
+
+			getCharacters(no_of_items);
 
 			$("#submitButton").click(function(event) {
 				var drag_targets = document.getElementsByClassName('dragme');
@@ -237,29 +252,9 @@
 						getRatingData(item_id, name, image_url);
 					}
 				}
-
-				// for (var i=0; i < items.length; i++) {
-				// 	var item_id = items[i]['id'];
-				// 	var url = "http://54.219.178.230/api/Items/" + items[i]['id'] + "/ratings";
-				// 	$.get("http://54.219.178.230/api/Items/" + items[i]['id'] + "/ratings", function(data, status){
-				// 		var ratings = data;
-				// 		var sum_x = 0;
-				// 		var sum_y = 0;
-				// 		for (var j=0; j < ratings.length; i++) {
-				// 			sum_x += ratings[j]['x_value'];
-				// 			sum_y += ratings[j]['y_value'];
-				// 		}
-				// 		items[i]['x_average'] = sum_x / ratings.length;
-				// 		items[i]['y_average'] = sum_y / ratings.length;
-				// 	});
-				// }
-
-
+				$(this).prop('disabled', true);
 			});
 		});
-
-
-
 		</script>
   </body>
 </html>
