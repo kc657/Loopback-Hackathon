@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Narrow Jumbotron Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+		<style rel="stylesheet">
+		drag {
+	    position:  absolute;
+	    left: 10px;
+	    top: 10px; /* set these so Chrome doesn't return 'auto' from getComputedStyle */
+	    width: 100px;
+			height: 100px;
+	    border: 2px  solid rgba(0,0,0,0.5);
+			border-radius: 300px;
+			overflow: hidden;
+			text-align: center;
+			padding-top: 40px;
+		}
+		result {
+			position:  absolute;
+	    left: 10px;
+	    top: 10px; /* set these so Chrome doesn't return 'auto' from getComputedStyle */
+	    width: 100px;
+			height: 100px;
+	    border: 2px  solid rgba(0,0,0,0.5);
+			opacity: 0.7;
+			z-index: -2;
+			border-radius: 300px;
+			overflow: hidden;
+			text-align: center;
+			padding-top: 40px;
+		}
+		.test-img-thumbnail {
+			position:  absolute;
+	    left: 0;
+	    top: 0; /* set these so Chrome doesn't return 'auto' from getComputedStyle */
+	    width: 100%;
+			height: 100%;
+			z-index: -1;
+		}
+
+		.character-row {
+			height: 100px;
+			padding: 30px;
+		}
+
+		.graph-img {
+			position: absolute;
+			top: 130px;
+			left: 60px;
+			width: 800px;
+			height: 600px;
+			z-index: -99;
+			border: 2px  solid #000;
+		}
+		.item-name {
+			color: #fff;
+			font-size: 0.9em;
+		}
+    </style>
+  </head>
+
+  <body>
+		<div class="character-row">
+		</div>
+		<span id="x_max" style="position:absolute; left:860px; top:430px;"></span>
+		<span id="x_min" style="position:absolute; left:30px; top:430px;"></span>
+		<span id="y_min" style="position:absolute; left:460px; top:724px;"></span>
+		<span id="y_max" style="position:absolute; left:460px; top:110px;"></span>
+		<img class="graph-img" src="graph.jpg" />
+		<div style="left:900px;position: absolute;">
+			<button class="btn" id="submitButton">submit</button>
+			<button class="btn" onclick="location.reload();">refresh</button>
+		</div>
+
+    </div> <!-- /container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+    <script>
+		var offset_data; //Global variable as Chrome doesn't allow access to event.dataTransfer in dragover
+		var current_target;
+		function drag_start(event) {
+			current_target = event.target;
+	    var style = window.getComputedStyle(event.target, null);
+	    offset_data = (parseInt(style.getPropertyValue("left"),10) - event.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - event.clientY);
+	    event.dataTransfer.setData("text/plain",offset_data);
+		}
+		function drag_over(event) {
+		    var offset;
+		    try {
+		        offset = event.dataTransfer.getData("text/plain").split(',');
+		    }
+		    catch(e) {
+		        offset = offset_data.split(',');
+		    }
+		    // var dm = document.getElementById('dragme');
+				dm = current_target;
+		    dm.style.left = (event.clientX + parseInt(offset[0],10)) + 'px';
+		    dm.style.top = (event.clientY + parseInt(offset[1],10)) + 'px';
+		    event.preventDefault();
+		    return false;
+		}
+		function drop(event) {
+				var x_value = ((event.clientX-60) / 800 * 100);
+
+				var y_value = 100 - ((event.clientY-130) / 600 * 100);
+
+				if (x_value > 100 || y_value > 100) {
+					return;
+				}
+
+		    var offset;
+		    try {
+		        offset = event.dataTransfer.getData("text/plain").split(',');
+		    }
+		    catch(e) {
+		        offset = offset_data.split(',');
+		    }
+		    // var dm = document.getElementById('dragme');
+				dm = current_target;
+		    dm.style.left = (event.clientX + parseInt(offset[0],10)) + 'px';
+		    dm.style.top = (event.clientY + parseInt(offset[1],10)) + 'px';
+
+
+				dm.setAttribute('data-x_value', x_value);
+				(dm).setAttribute('data-y_value', y_value);
+				// console.log(dm);
+
+				current_target = "";
+		    event.preventDefault();
+		    return false;
+		}
+
+		function shuffle(array) {
+		  var currentIndex = array.length, temporaryValue, randomIndex;
+
+		  // While there remain elements to shuffle...
+		  while (0 !== currentIndex) {
+
+		    // Pick a remaining element...
+		    randomIndex = Math.floor(Math.random() * currentIndex);
+		    currentIndex -= 1;
+
+		    // And swap it with the current element.
+		    temporaryValue = array[currentIndex];
+		    array[currentIndex] = array[randomIndex];
+		    array[randomIndex] = temporaryValue;
+		  }
+
+		  return array;
+		}
+
+		var dm = document.getElementById('dragme');
+		var drag_targets = document.getElementsByClassName('dragme');
+		for (var i=0; i<drag_targets.length; i++) {
+			drag_targets[i].addEventListener('dragstart',drag_start,false);
+		}
+		// dm.addEventListener('dragstart',drag_start,false);
+		document.body.addEventListener('dragover',drag_over,false);
+		document.body.addEventListener('drop',drop,false);
+
+		function getRatingData(item_id, name, image_url) {
+			var url = "http://54.219.178.230/api/Items/" + item_id + "/ratings";
+			var sum_x = 0;
+			var sum_y = 0;
+			$.get(url, function(data, status){
+				var ratings = data;
+				for (var j=0; j < ratings.length; j++) {
+					sum_x += ratings[j]['x_value'];
+					sum_y += ratings[j]['y_value'];
+				}
+				var avg_x = sum_x / ratings.length;
+				var avg_y = sum_y / ratings.length;
+
+				var transformed_x = (avg_x * 8) + 60;
+				var transformed_y = (((100 - avg_y) * 6) + 130);
+
+				console.log(item_id);
+
+				var html = '<result style="position:absolute; left:' + transformed_x + 'px; top:' + transformed_y + 'px;" data-item_id='+ item_id +'><img src="' + image_url + '" class="test-img-thumbnail"/><span class="item-name">'+ name +'</span></result>';
+				$("body").append(html);
+			});
+		}
+
+
+		$(document).ready(function(){
+			var surveys;
+			var items;
+			var no_of_items = 3;
+
+			$.get("http://54.219.178.230/api/Surveys", function(data, status){
+				surveys = data;
+				var survey_id = surveys[0]['id'];
+				$("#x_max").html(surveys[0]['x_axis_max']);
+				$("#x_min").html(surveys[0]['x_axis_min']);
+				$("#y_max").html(surveys[0]['y_axis_max']);
+				$("#y_min").html(surveys[0]['y_axis_min']);
+				$.get("http://54.219.178.230/api/Surveys/"+ survey_id +"/items", function(data, status){
+					items = shuffle(data);
+					var leftOffset = 110
+					for (var i = 0; i < no_of_items; i++) {
+						// console.log(items[i]);
+						var html = '<drag draggable="true" class="dragme" style="left:' + (leftOffset*i + 60) + 'px;" data-name="' + items[i]['name'] + '" data-image_url="' + items[i]['image_url'] + '" data-item_id='+ items[i]['id'] +'><img src="' + items[i]['image_url'] + '" class="test-img-thumbnail" /><span class="item-name">'+ items[i]['name'] +'</span></drag>';
+						$(".character-row").append(html)
+					}
+					for (var i=0; i<drag_targets.length; i++) {
+						drag_targets[i].addEventListener('dragstart',drag_start,false);
+					}
+				});
+				// console.log(surveys[0]);
+			});
+
+			$("#submitButton").click(function(event) {
+				var drag_targets = document.getElementsByClassName('dragme');
+				for (var i=0; i<drag_targets.length; i++) {
+					var item_id = drag_targets[i].getAttribute("data-item_id");
+					var x_value = drag_targets[i].getAttribute("data-x_value");
+					var y_value = drag_targets[i].getAttribute("data-y_value");
+					var name = drag_targets[i].getAttribute("data-name");
+					var image_url = drag_targets[i].getAttribute("data-image_url");
+					if (x_value > 0 && y_value > 0) {
+						var payload = { "x_value": x_value, "y_value": y_value, "itemId": item_id}
+						$.post("http://54.219.178.230/api/Ratings", payload);
+						getRatingData(item_id, name, image_url);
+					}
+				}
+
+				// for (var i=0; i < items.length; i++) {
+				// 	var item_id = items[i]['id'];
+				// 	var url = "http://54.219.178.230/api/Items/" + items[i]['id'] + "/ratings";
+				// 	$.get("http://54.219.178.230/api/Items/" + items[i]['id'] + "/ratings", function(data, status){
+				// 		var ratings = data;
+				// 		var sum_x = 0;
+				// 		var sum_y = 0;
+				// 		for (var j=0; j < ratings.length; i++) {
+				// 			sum_x += ratings[j]['x_value'];
+				// 			sum_y += ratings[j]['y_value'];
+				// 		}
+				// 		items[i]['x_average'] = sum_x / ratings.length;
+				// 		items[i]['y_average'] = sum_y / ratings.length;
+				// 	});
+				// }
+
+
+			});
+		});
+
+
+
+		</script>
+  </body>
+</html>
